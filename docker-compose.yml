@@ -1,0 +1,9 @@
+services:
+  subscriptions-db:
+    image: postgres:16.1
+    container_name: subscriptions-db
+    restart: on-failure
+    environment:
+      - POSTGRES_DB=subscriptions
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
