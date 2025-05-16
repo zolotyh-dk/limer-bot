@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://request-db:5432/subscriptions-db
+    username: postgres
+    password: postgres
+
+bot:
+  name: "LimerBot"
+  token: {$BOT_TOKEN:}
