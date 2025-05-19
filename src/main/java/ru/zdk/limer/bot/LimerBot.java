@@ -1,7 +1,7 @@
 package ru.zdk.limer.bot;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -10,14 +10,23 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.zdk.limer.config.BotProperties;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class LimerBot extends TelegramLongPollingBot {
+    private static final Logger logger = LoggerFactory.getLogger(LimerBot.class);
+
     private final BotProperties botProperties;
+
+    public LimerBot(BotProperties botProperties) {
+        this.botProperties = botProperties;
+    }
 
     @Override
     public String getBotUsername() {
         return botProperties.getName();
+    }
+
+    @Override
+    public String getBotToken() {
+        return botProperties.getToken();
     }
 
     @Override
@@ -26,7 +35,7 @@ public class LimerBot extends TelegramLongPollingBot {
         try {
             execute(new SendMessage(chatId, "Привет! Это " + botProperties.getName()));
         } catch (TelegramApiException e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 }
