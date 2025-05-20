@@ -1,5 +1,10 @@
 package ru.zdk.limer.bot;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -32,10 +37,29 @@ public class LimerBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         String chatId = update.getMessage().getChatId().toString();
-        try {
-            execute(new SendMessage(chatId, "Привет! Это " + botProperties.getName()));
-        } catch (TelegramApiException e) {
-            logger.error(e.getMessage());
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String url = update.getMessage().getText();
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--headless");
+            WebDriver driver = new ChromeDriver(options);
+            try {
+                driver.get(url);
+                logger.info(driver.getPageSource());
+
+                // Поиск мета-тега og:title
+                WebElement metaOgTitle = driver.findElement(By.cssSelector("meta[property='og:title']"));
+
+                // Получение значения атрибута content
+                String ogTitle = metaOgTitle.getAttribute("content");
+                try {
+                    execute(new SendMessage(chatId, "Вы запросили: " + ogTitle));
+                } catch (TelegramApiException e) {
+                    logger.error(e.getMessage());
+                }
+            } finally {
+                driver.quit();
+            }
+
         }
     }
 }
